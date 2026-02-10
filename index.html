@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resource Reflector</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Resource Reflector</h1>
+
+  <!-- Add Resource Form -->
+  <div class="form-container">
+    <h2>Add Resource</h2>
+    <form id="resourceForm">
+      <input type="text" id="title" placeholder="Title" required>
+      <select id="type" required>
+        <option value="">Select type</option>
+        <option value="link">Link</option>
+        <option value="note">Note</option>
+        <option value="file">File</option>
+      </select>
+      <input type="text" id="content" placeholder="URL or Note Content">
+      <input type="file" id="fileInput" class="hidden">
+      <input type="text" id="tags" placeholder="Tags (comma separated)">
+      <button type="submit" class="signature-btn">Add Resource</button>
+    </form>
+  </div>
+
+  <!-- Search -->
+  <div class="search-container">
+    <input type="text" id="search" placeholder="Search by title or tag...">
+  </div>
+
+  <!-- Resource List -->
+  <div id="resourceList" class="resource-list"></div>
+
+  <!-- Footer Signature -->
+  <footer class="footer">
+    — structured by Nubaid
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
