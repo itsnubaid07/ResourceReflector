@@ -1,8 +1,24 @@
 // Personal signature log
-console.log("Crafted patiently by Nubaid — clarity first.");
+console.log("Crafted patiently by Nubaid — clarity first via IndexedDB.");
 
-// Initialize resources
-let resources = JSON.parse(localStorage.getItem('resources')) || [];
+// 1. Initialize IndexedDB
+let db;
+const dbRequest = indexedDB.open("ResourceReflectorDB", 1);
+
+dbRequest.onerror = (event) => console.error("Database error:", event.target.error);
+
+dbRequest.onsuccess = (event) => {
+  db = event.target.result;
+  renderResources(); // Render data once DB is ready
+};
+
+// This runs only the first time the app loads (or during version upgrades)
+dbRequest.onupgradeneeded = (event) => {
+  db = event.target.result;
+  if (!db.objectStoreNames.contains("resources")) {
+    db.createObjectStore("resources", { keyPath: "id", autoIncrement: true });
+  }
+};
 
 // DOM elements
 const resourceList = document.getElementById('resourceList');
@@ -23,65 +39,91 @@ typeSelect.addEventListener('change', () => {
   }
 });
 
-// Save to localStorage
-function saveResources() {
-  localStorage.setItem('resources', JSON.stringify(resources));
-}
-
-// Render resources
+// 2. READ: Render resources with search filter
 function renderResources(filter='') {
+  if (!db) return; // Wait until database connection opens
+
   resourceList.innerHTML = '';
-  const filtered = resources.filter(r =>
-    r.title.toLowerCase().includes(filter.toLowerCase()) ||
-    r.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
-  );
+  
+  const transaction = db.transaction(["resources"], "readonly");
+  const store = transaction.objectStore("resources");
+  const request = store.getAll();
 
-  if(filtered.length === 0){
-    resourceList.innerHTML = '<p style="color: #6b7280;">No resources found.</p>';
-    return;
-  }
+  request.onsuccess = () => {
+    const allResources = request.result;
+    
+    // Filter the items locally in memory for maximum speed
+    const filtered = allResources.filter(r =>
+      r.title.toLowerCase().includes(filter.toLowerCase()) ||
+      r.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+    );
 
-  filtered.forEach((res, index) => {
-    const card = document.createElement('div');
-    card.className = 'resource-card';
-
-    let contentHTML = '';
-    if(res.type === 'link'){
-      contentHTML = `<a href="${res.content}" target="_blank">${res.content}</a>`;
-    } else if(res.type === 'note'){
-      contentHTML = res.content;
-    } else if(res.type === 'file'){
-      if(res.fileType.startsWith('image/')){
-        contentHTML = `<img src="${res.content}" alt="${res.fileName}">`;
-      } else {
-        contentHTML = `<a href="${res.content}" download="${res.fileName}">${res.fileName}</a>`;
-      }
+    if(filtered.length === 0){
+      resourceList.innerHTML = '<p style="color: #6b7280;">No resources found.</p>';
+      return;
     }
 
-    card.innerHTML = `
-      <div>
-        <h3>${res.title} <span style="font-size:0.85rem; color:#6b7280;">[${res.type}]</span></h3>
-        <p>${contentHTML}</p>
-        <p class="resource-tags">Tags: ${res.tags.join(', ')}</p>
-      </div>
-      <div>
-        <span class="delete-btn" onclick="deleteResource(${index})">Delete</span>
-      </div>
-    `;
-    resourceList.appendChild(card);
-  });
+    filtered.forEach((res) => {
+      const card = document.createElement('div');
+      card.className = 'resource-card';
+
+      let contentHTML = '';
+      if(res.type === 'link'){
+        contentHTML = `<a href="${res.content}" target="_blank">${res.content}</a>`;
+      } else if(res.type === 'note'){
+        contentHTML = res.content;
+      } else if(res.type === 'file'){
+        if(res.fileType && res.fileType.startsWith('image/')){
+          contentHTML = `<img src="${res.content}" alt="${res.fileName}">`;
+        } else {
+          contentHTML = `<a href="${res.content}" download="${res.fileName}">${res.fileName}</a>`;
+        }
+      }
+
+      // Pass the actual database unique 'id' to the delete function
+      card.innerHTML = `
+        <div>
+          <h3>${res.title} <span style="font-size:0.85rem; color:#6b7280;">[${res.type}]</span></h3>
+          <p>${contentHTML}</p>
+          <p class="resource-tags">Tags: ${res.tags.join(', ')}</p>
+        </div>
+        <div>
+          <span class="delete-btn" onclick="deleteResource(${res.id})">Delete</span>
+        </div>
+      `;
+      resourceList.appendChild(card);
+    });
+  };
 }
 
-// Delete resource
-function deleteResource(index){
+// 3. DELETE: Remove item by its unique ID
+function deleteResource(id){
   if(confirm('Delete this resource?')){
-    resources.splice(index,1);
-    saveResources();
-    renderResources(searchInput.value);
+    const transaction = db.transaction(["resources"], "readwrite");
+    const store = transaction.objectStore("resources");
+    const request = store.delete(id);
+
+    request.onsuccess = () => {
+      renderResources(searchInput.value);
+    };
   }
 }
 
-// Add Resource
+// Helper function to save items to IndexedDB
+function addResourceToDB(resourceObject) {
+  const transaction = db.transaction(["resources"], "readwrite");
+  const store = transaction.objectStore("resources");
+  const request = store.add(resourceObject);
+
+  request.onsuccess = () => {
+    renderResources(searchInput.value);
+    form.reset();
+    contentInput.classList.remove('hidden');
+    fileInput.classList.add('hidden');
+  };
+}
+
+// 4. CREATE: Add Resource
 form.addEventListener('submit', (e)=>{
   e.preventDefault();
   const title = document.getElementById('title').value;
@@ -89,35 +131,24 @@ form.addEventListener('submit', (e)=>{
   const tags = document.getElementById('tags').value.split(',').map(t=>t.trim()).filter(t=>t);
 
   if(type === 'file'){
-    const file = fileInput.files[0];
+    const file = fileInput.files[0]; // Crucial Fix: targeted the singular active file descriptor
     if(!file){ alert('Please select a file'); return; }
 
     const reader = new FileReader();
     reader.onload = function(event){
-      resources.push({
+      addResourceToDB({
         title, type, content: event.target.result,
         tags, fileName: file.name, fileType: file.type
       });
-      saveResources();
-      renderResources(searchInput.value);
-      form.reset();
-      contentInput.classList.remove('hidden');
-      fileInput.classList.add('hidden');
     }
     reader.readAsDataURL(file);
   } else {
     const content = contentInput.value;
-    resources.push({ title, type, content, tags });
-    saveResources();
-    renderResources(searchInput.value);
-    form.reset();
+    addResourceToDB({ title, type, content, tags });
   }
 });
 
-// Search
+// 5. SEARCH: Live filter
 searchInput.addEventListener('input', ()=>{
   renderResources(searchInput.value);
 });
-
-// Initial render
-renderResources();
