@@ -8,37 +8,67 @@
 </head>
 <body>
 
-  <h1>Resource Reflector</h1>
+  <header class="app-header">
+    <h1>Resource Reflector</h1>
+    <p class="subtitle">A quiet space for scattered thoughts, links, and files.</p>
+  </header>
 
-  <!-- Add Resource Form -->
-  <div class="form-container">
-    <h2>Add Resource</h2>
-    <form id="resourceForm">
-      <input type="text" id="title" placeholder="Title" required>
-      <select id="type" required>
-        <option value="">Select type</option>
-        <option value="link">Link</option>
-        <option value="note">Note</option>
-        <option value="file">File</option>
-      </select>
-      <input type="text" id="content" placeholder="URL or Note Content">
-      <input type="file" id="fileInput" class="hidden">
-      <input type="text" id="tags" placeholder="Tags (comma separated)">
-      <button type="submit" class="signature-btn">Add Resource</button>
-    </form>
-  </div>
+  <main class="main-content">
+    <!-- Capture Form -->
+    <section class="form-container">
+      <h2>What are we saving?</h2>
+      <form id="resourceForm">
+        <div class="input-group">
+          <input type="text" id="title" placeholder="Give it a title..." required>
+        </div>
 
-  <!-- Search -->
-  <div class="search-container">
-    <input type="text" id="search" placeholder="Search by title or tag...">
-  </div>
+        <div class="input-group row">
+          <select id="type" required>
+            <option value="" disabled selected>Select a format</option>
+            <option value="link">🔗 Link</option>
+            <option value="note">✍️ Thought / Note</option>
+            <option value="file">📁 File attachment</option>
+          </select>
+        </div>
 
-  <!-- Resource List -->
-  <div id="resourceList" class="resource-list"></div>
+        <div class="input-group">
+          <textarea id="content" placeholder="Paste your link, or drop a verified data packet harvested by verify_and_scrape.py here..." rows="3"></textarea>
+          <input type="file" id="fileInput" class="hidden">
+        </div>
 
-  <!-- Footer Signature -->
+        <div class="input-group">
+          <input type="text" id="tags" placeholder="Tags (e.g. inspiration, coding, reading)">
+        </div>
+
+        <button type="submit" class="signature-btn">Deposit into memory</button>
+      </form>
+    </section>
+
+    <!-- Search & Filter Workspace -->
+    <section class="search-workspace">
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Filter through your reflections...">
+      </div>
+      
+      <!-- Resource Cards Container -->
+      <div id="resourceList" class="resource-list"></div>
+    </section>
+
+    <!-- Data Vault: Offline Backup Panel -->
+    <section class="form-container utility-panel">
+      <h2>Data Vault</h2>
+      <p class="subtitle" style="margin-bottom: 1.25rem;">Safeguard or restore your collected memories locally.</p>
+      <div class="utility-actions">
+        <button id="exportBtn" class="signature-btn minor-btn">📤 Export Backup (JSON)</button>
+        <label for="importFile" class="custom-file-label">📥 Import Backup</label>
+        <input type="file" id="importFile" accept=".json" class="hidden">
+      </div>
+    </section>
+  </main>
+
+  <!-- Handmade Footer Signature -->
   <footer class="footer">
-    — structured by Nubaid
+    <p>Handcrafted out of personal necessity by Nubaid. Clarity first.</p>
   </footer>
 
   <script src="script.js"></script>

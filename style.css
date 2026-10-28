@@ -1,118 +1,338 @@
-/* Basic reset */
+/* Custom variables for an organic, analog palette */
+:root {
+  --bg-color: #f4f3ef;       /* Soft matte cardstock tone (removes white void entirely) */
+  --card-bg: #ffffff;        /* Crisp white for focus elements */
+  --text-primary: #252422;   /* Editorial ink charcoal */
+  --text-muted: #6e6b64;     /* Muted clay for secondary details */
+  --accent: #005a36;         /* Deep Islamic Green (inspired by Bangladesh & Saudi flags) */
+  --accent-hover: #004428;   /* Shadow green for hover interactions */
+  --border: #dcdaee;         /* Subtle tint divider lines */
+  --border-focus: #a8a6b4;   /* Warm indicator color on input focus */
+  --danger: #c94c4c;         /* Muted deep red for deletion actions */
+  --radius: 8px;             /* Crisp, handmade corner radius */
+}
+
+/* Base Setup */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
 }
 
 body {
-  background: #f3f4f6;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 4rem 1.5rem;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  font-weight: bold;
-  color: #1a73e8; /* Signature Nubaid blue */
+/* Typography Hub */
+.app-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  max-width: 640px;
+  width: 100%;
 }
 
-.form-container, .search-container {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--accent); /* Nubaid green title branding anchor */
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  border-bottom: 2px solid #e5e3dd;
+  padding-bottom: 0.5rem;
+}
+
+/* Structured Main Workspace Layout */
+.main-content {
   width: 100%;
-  max-width: 600px;
-  margin-bottom: 1rem;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Tactile Framed Workspace Panels */
+.form-container, .search-workspace {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  border: 1px solid #e1ded7;
+  box-shadow: 0 4px 12px rgba(37, 36, 34, 0.03); /* Soft structural shadow depth */
+  width: 100%;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.25rem;
 }
 
-input, select, button {
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid #ccc;
+/* Unified input structure styles */
+.input-group {
+  display: flex;
+  flex-direction: column;
 }
 
-button {
-  background: #1a73e8; /* Nubaid blue */
-  color: #fff;
+input[type="text"], select, textarea {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background-color: #faf9f5; /* Cream inner fill for container contrast */
+  border: 1px solid #dcd9d0;
+  border-radius: var(--radius);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent); /* Form activates your green indicator border */
+  background-color: #ffffff;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  /* FIXED: Fully restored standard W3C namespace URL parameters to prevent arrow layout drops */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%236e6b64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* Handcrafted Primary Button */
+button.signature-btn {
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #ffffff;
   border: none;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-button:hover {
-  background: #155ab6;
+button.signature-btn:hover {
+  background: var(--accent-hover);
 }
 
-.signature-btn {
-  font-weight: bold;
+button.signature-btn:active {
+  transform: scale(0.99); /* Gentle physical click feedback response */
 }
 
 .hidden {
   display: none;
 }
 
+/* Dynamic Live Filter Search Bar Context */
+.search-container {
+  margin-bottom: 2rem;
+}
+
+.search-container input {
+  background-color: #ffffff; /* High contrast inner fill against wrapper container */
+  border: 1px solid #dcd9d0;
+}
+
 .resource-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.25rem;
   width: 100%;
-  max-width: 600px;
 }
 
+/* Reimagined Design Pattern: Resource Storage Cards */
 .resource-card {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid #e8e6df;
+  border-left: 4px solid var(--accent); /* Clean left ribbon binding cards to your Green theme */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.resource-card:hover {
+  transform: translateY(-2px); /* Physical tactile card lift sensation */
+}
+
+.resource-card-header {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .resource-card h3 {
-  font-weight: bold;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
-.resource-card img {
-  max-width: 200px;
-  max-height: 150px;
-  border-radius: 0.25rem;
-  margin-top: 0.5rem;
+.resource-content {
+  font-family: Georgia, Cambria, serif; /* Editorial texture style for long reflections */
+  font-size: 1.05rem;
+  color: #383734;
+  white-space: pre-wrap;
+  background: #fbfbfa;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #f2f0ea;
 }
 
 .resource-card a {
-  color: #1a73e8; /* Nubaid blue for links */
-  text-decoration: underline;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+  border-bottom: 1px dashed var(--accent);
+}
+
+.resource-card a:hover {
+  color: var(--accent-hover);
+  border-bottom-style: solid;
+}
+
+.resource-card img {
+  max-width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e8e6df;
+}
+
+/* Card lower meta configuration rows */
+.resource-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f4f3ef;
 }
 
 .resource-tags {
-  font-size: 0.85rem;
-  color: #6b7280;
-  margin-top: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Custom Colored Flag Green Badges */
+.tag-badge {
+  background: #e6eee9; /* Clean, light green background wash tint */
+  color: var(--accent); /* High contrast bold green text string fill */
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
 }
 
 .delete-btn {
-  color: #ef4444;
-  font-weight: bold;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  margin-top: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s;
 }
 
+.delete-btn:hover {
+  color: var(--danger);
+  background: #fdf2f2; /* Subtle warning backdrop only when wiping data structures */
+}
+
+/* Signature Brand Footer */
 .footer {
-  margin-top: 2rem;
+  margin-top: 5rem;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
+  text-align: center;
+  border-top: 1px solid #e1ded7;
+  padding-top: 2rem;
+  width: 100%;
+  max-width: 640px;
+}
+
+/* --- DATA VAULT WORKSPACE STYLING --- */
+.utility-panel {
+  margin-top: 1.5rem;
+}
+
+.utility-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+button.minor-btn {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+button.minor-btn:hover {
+  background: #e6eee9 !important;
+  color: var(--accent-hover) !important;
+}
+
+.custom-file-label {
+  padding: 0.75rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease;
+}
+
+.custom-file-label:hover {
+  background: var(--accent-hover);
 }
