@@ -4,7 +4,7 @@ I built this because my browser tabs were constantly cluttered, my personal note
 
 Resource Reflector is a calm, local-first workspace for your browser. It doesn't require an account, it uses no servers, logs zero telemetry, and stores absolutely no tracking cookies. It just holds onto your links, thoughts, and files using your browser's own protected memory storage (IndexedDB).
 
-👉 **Live Space:** https://github.io
+👉 **Live Space:** https://itsnubaid07.github.io/ResourceReflector/
 
 ## ⚡ The Out-of-the-Box Extension: Diagnostic Scraper Gateway
 To bypass browser CORS isolation limits and prevent dead links from polluting the local database, this repository includes an independent Python command-line ecosystem utility: `verify_and_scrape.py`.
