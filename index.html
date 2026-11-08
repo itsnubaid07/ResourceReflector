@@ -16,13 +16,13 @@
   <main class="main-content">
     <!-- Capture Form -->
     <section class="form-container">
-      <h2>What are we saving?</h2>
+      <h2>Commit Resource</h2>
       <form id="resourceForm">
         <div class="input-group">
-          <input type="text" id="title" placeholder="Give it a title..." required>
+          <input type="text" id="title" placeholder="Resource header or paste linkharvest.py payload..." required>
         </div>
 
-        <div class="input-group row">
+        <div class="input-group">
           <select id="type" required>
             <option value="" disabled selected>Select a format</option>
             <option value="link">🔗 Link</option>
@@ -32,22 +32,22 @@
         </div>
 
         <div class="input-group">
-          <textarea id="content" placeholder="Paste your link, or drop a verified data packet harvested by verify_and_scrape.py here..." rows="3"></textarea>
+          <textarea id="content" placeholder="Paste link URL or drop text contents here..." rows="3" required></textarea>
           <input type="file" id="fileInput" class="hidden">
         </div>
 
         <div class="input-group">
-          <input type="text" id="tags" placeholder="Tags (e.g. inspiration, coding, reading)">
+          <input type="text" id="tags" placeholder="Tags (comma separated: coding, history, science)">
         </div>
 
-        <button type="submit" class="signature-btn">Deposit into memory</button>
+        <button type="submit" class="signature-btn">Commit to Storage</button>
       </form>
     </section>
 
     <!-- Search & Filter Workspace -->
     <section class="search-workspace">
       <div class="search-container">
-        <input type="text" id="search" placeholder="Filter through your reflections...">
+        <input type="text" id="search" placeholder="Filter ledger records...">
       </div>
       
       <!-- Resource Cards Container -->
@@ -57,18 +57,17 @@
     <!-- Data Vault: Offline Backup Panel -->
     <section class="form-container utility-panel">
       <h2>Data Vault</h2>
-      <p class="subtitle" style="margin-bottom: 1.25rem;">Safeguard or restore your collected memories locally.</p>
+      <p class="subtitle" style="margin-bottom: 1.25rem;">Isolated local state snapshot management.</p>
       <div class="utility-actions">
-        <button id="exportBtn" class="signature-btn minor-btn">📤 Export Backup (JSON)</button>
-        <label for="importFile" class="custom-file-label">📥 Import Backup</label>
+        <button id="exportBtn" class="signature-btn minor-btn">📤 Export JSON</button>
+        <label for="importFile" class="custom-file-label">📥 Import JSON</label>
         <input type="file" id="importFile" accept=".json" class="hidden">
       </div>
     </section>
   </main>
 
-  <!-- Handmade Footer Signature -->
   <footer class="footer">
-    <p>Handcrafted out of personal necessity by Nubaid. Clarity first.</p>
+    <p>Handcrafted out of personal necessity by Nubaid </p>
   </footer>
 
   <script src="script.js"></script>

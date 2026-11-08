@@ -1,15 +1,13 @@
-/* Custom variables for an organic, analog palette */
+/* Core personal variables - anchored by flag green */
 :root {
-  --bg-color: #f4f3ef;       /* Soft matte cardstock tone (removes white void entirely) */
-  --card-bg: #ffffff;        /* Crisp white for focus elements */
-  --text-primary: #252422;   /* Editorial ink charcoal */
-  --text-muted: #6e6b64;     /* Muted clay for secondary details */
-  --accent: #005a36;         /* Deep Islamic Green (inspired by Bangladesh & Saudi flags) */
-  --accent-hover: #004428;   /* Shadow green for hover interactions */
-  --border: #dcdaee;         /* Subtle tint divider lines */
-  --border-focus: #a8a6b4;   /* Warm indicator color on input focus */
-  --danger: #c94c4c;         /* Muted deep red for deletion actions */
-  --radius: 8px;             /* Crisp, handmade corner radius */
+  --canvas-paper: #f5f4ef;    /* Soft cardstock tint */
+  --panel-solid: #ffffff;     /* White fill for elements */
+  --ink-black: #1e1e1f;       /* Dark typewriter black */
+  --clay-gray: #686661;       /* Secondary details text color */
+  --flag-green: #005a36;      /* High contrast theme green */
+  --hover-green: #004225;     /* Darker hover background */
+  --alert-red: #ba3c3c;       /* Muted warning red */
+  --ui-radius: 6px;           /* Tight manual radius */
 }
 
 /* Base Setup */
@@ -20,319 +18,280 @@
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
+  background-color: var(--canvas-paper);
+  color: var(--ink-black);
+  /* Forced monospaced layout to break clean web template conventions */
+  font-family: 'Courier New', Courier, monospace;
+  padding: 3rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4rem 1.5rem;
-  min-height: 100vh;
+  line-height: 1.5;
 }
 
-/* Typography Hub */
+/* Typography Layout Hub */
 .app-header {
-  text-align: center;
-  margin-bottom: 3.5rem;
-  max-width: 640px;
+  text-align: left; /* Shifted left to eliminate generic centered templates */
   width: 100%;
+  max-width: 620px;
+  margin-bottom: 2.5rem;
+  border-left: 3px solid var(--flag-green);
+  padding-left: 15px;
 }
 
 h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--accent); /* Nubaid green title branding anchor */
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--flag-green);
 }
 
 .subtitle {
-  color: var(--text-muted);
-  font-size: 1.05rem;
-  font-weight: 400;
+  color: var(--clay-gray);
+  font-size: 0.9rem;
 }
 
 h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 1.5rem;
-  color: var(--text-primary);
-  border-bottom: 2px solid #e5e3dd;
-  padding-bottom: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed var(--clay-gray);
+  padding-bottom: 4px;
 }
 
-/* Structured Main Workspace Layout */
+/* Main Content Wrapper */
 .main-content {
   width: 100%;
-  max-width: 640px;
+  max-width: 620px;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
-/* Tactile Framed Workspace Panels */
+/* Tactile Casing Panels */
 .form-container, .search-workspace {
-  background: var(--card-bg);
-  padding: 2rem;
-  border-radius: var(--radius);
-  border: 1px solid #e1ded7;
-  box-shadow: 0 4px 12px rgba(37, 36, 34, 0.03); /* Soft structural shadow depth */
-  width: 100%;
+  background: var(--panel-solid);
+  padding: 1.5rem;
+  border: 2px solid var(--ink-black);       /* Solid line boundaries */
+  box-shadow: 4px 4px 0px var(--ink-black); /* Sharp flat 2D hardware shadows */
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
-/* Unified input structure styles */
 .input-group {
   display: flex;
   flex-direction: column;
 }
 
+/* Monospaced Input Canvas Fields */
 input[type="text"], select, textarea {
   width: 100%;
-  padding: 0.85rem;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-  background-color: #faf9f5; /* Cream inner fill for container contrast */
-  border: 1px solid #dcd9d0;
-  border-radius: var(--radius);
-  transition: border-color 0.2s, background-color 0.2s;
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink-black);
+  background-color: #faf9f6;
+  border: 1px solid var(--ink-black);
+  border-radius: 0; /* Boxy inputs for a raw look */
 }
 
 textarea {
   resize: vertical;
-  font-family: inherit;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--accent); /* Form activates your green indicator border */
   background-color: #ffffff;
+  border: 2px solid var(--flag-green);
 }
 
 select {
   cursor: pointer;
   appearance: none;
-  /* FIXED: Fully restored standard W3C namespace URL parameters to prevent arrow layout drops */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%236e6b64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  /* FIXED: Fully restored standard W3C namespace URL strings to fix arrow drops */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%23686661' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1em;
   padding-right: 2.5rem;
 }
 
-/* Handcrafted Primary Button */
+/* Primary Execution Button */
 button.signature-btn {
-  padding: 0.9rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  border-radius: var(--radius);
-  background: var(--accent);
+  width: 100%;
+  padding: 0.8rem;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 0.95rem;
+  background: var(--flag-green);
   color: #ffffff;
-  border: none;
+  border: 2px solid var(--ink-black);
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  box-shadow: 2px 2px 0px var(--ink-black);
+  transition: background-color 0.1s;
 }
 
 button.signature-btn:hover {
-  background: var(--accent-hover);
+  background: var(--hover-green);
 }
 
 button.signature-btn:active {
-  transform: scale(0.99); /* Gentle physical click feedback response */
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--ink-black);
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-/* Dynamic Live Filter Search Bar Context */
+/* Search Engine Filter Row */
 .search-container {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .search-container input {
-  background-color: #ffffff; /* High contrast inner fill against wrapper container */
-  border: 1px solid #dcd9d0;
+  background-color: #ffffff;
+  border: 1px solid var(--ink-black);
 }
 
 .resource-list {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  width: 100%;
+  gap: 1rem;
 }
 
-/* Reimagined Design Pattern: Resource Storage Cards */
+/* Dynamic Saved Memory Output Cards */
 .resource-card {
-  background: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  border: 1px solid #e8e6df;
-  border-left: 4px solid var(--accent); /* Clean left ribbon binding cards to your Green theme */
+  background: var(--panel-solid);
+  padding: 1rem;
+  border: 1px solid var(--ink-black);
+  border-left: 6px solid var(--flag-green); /* Thick left ribbon indicator border */
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.resource-card:hover {
-  transform: translateY(-2px); /* Physical tactile card lift sensation */
-}
-
-.resource-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  gap: 0.75rem;
 }
 
 .resource-card h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: bold;
 }
 
 .resource-content {
-  font-family: Georgia, Cambria, serif; /* Editorial texture style for long reflections */
-  font-size: 1.05rem;
-  color: #383734;
+  font-size: 0.9rem;
+  color: var(--ink-black);
   white-space: pre-wrap;
   background: #fbfbfa;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  border: 1px solid #f2f0ea;
+  padding: 8px;
+  border: 1px dotted var(--clay-gray);
+  word-break: break-all;
 }
 
 .resource-card a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-  word-break: break-all;
-  border-bottom: 1px dashed var(--accent);
+  color: var(--flag-green);
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 .resource-card a:hover {
-  color: var(--accent-hover);
-  border-bottom-style: solid;
+  color: var(--hover-green);
 }
 
 .resource-card img {
   max-width: 100%;
   height: auto;
-  max-height: 280px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid #e8e6df;
+  border: 1px solid var(--ink-black);
+  margin-top: 4px;
 }
 
-/* Card lower meta configuration rows */
+/* Footer Control Row Inside Saved Cards */
 .resource-footer-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.25rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f4f3ef;
+  font-size: 0.8rem;
+  border-top: 1px dashed var(--canvas-paper);
+  padding-top: 0.5rem;
 }
 
 .resource-tags {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
 }
 
-/* Custom Colored Flag Green Badges */
+/* Flat High-Contrast Badges */
 .tag-badge {
-  background: #e6eee9; /* Clean, light green background wash tint */
-  color: var(--accent); /* High contrast bold green text string fill */
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  letter-spacing: 0.02em;
+  background: #e1ede6;
+  color: var(--flag-green);
+  font-weight: bold;
+  padding: 2px 6px;
 }
 
 .delete-btn {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
   background: transparent;
   border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: all 0.15s;
+  color: var(--clay-gray);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .delete-btn:hover {
-  color: var(--danger);
-  background: #fdf2f2; /* Subtle warning backdrop only when wiping data structures */
+  color: var(--alert-red);
 }
 
-/* Signature Brand Footer */
+/* Bottom Signature Node */
 .footer {
-  margin-top: 5rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  text-align: center;
-  border-top: 1px solid #e1ded7;
-  padding-top: 2rem;
+  margin-top: 4rem;
+  font-size: 0.75rem;
+  color: var(--clay-gray);
   width: 100%;
-  max-width: 640px;
+  max-width: 620px;
+  text-align: left;
+  border-top: 1px dashed var(--clay-gray);
+  padding-top: 1rem;
 }
 
-/* --- DATA VAULT WORKSPACE STYLING --- */
+/* Data Vault Utility Sections */
 .utility-panel {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .utility-actions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
 }
 
 button.minor-btn {
-  background: transparent !important;
-  color: var(--accent) !important;
-  border: 1px solid var(--accent) !important;
-  padding: 0.75rem 1.2rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: var(--radius);
-  transition: all 0.2s ease;
+  background: #ffffff !important;
+  color: var(--flag-green) !important;
+  border: 2px solid var(--ink-black) !important;
+  box-shadow: 2px 2px 0px var(--ink-black) !important;
 }
 
 button.minor-btn:hover {
-  background: #e6eee9 !important;
-  color: var(--accent-hover) !important;
+  background: #e1ede6 !important;
 }
 
 .custom-file-label {
-  padding: 0.75rem 1.2rem;
+  padding: 0.8rem;
   font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: var(--radius);
-  background: var(--accent);
+  font-weight: bold;
+  background: var(--flag-green);
   color: #ffffff;
+  border: 2px solid var(--ink-black);
   cursor: pointer;
   display: inline-block;
-  border: 1px solid transparent;
-  transition: background-color 0.15s ease;
+  text-align: center;
+  box-shadow: 2px 2px 0px var(--ink-black);
+  flex-grow: 1;
 }
 
 .custom-file-label:hover {
-  background: var(--accent-hover);
+  background: var(--hover-green);
 }

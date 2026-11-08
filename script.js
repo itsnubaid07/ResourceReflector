@@ -1,272 +1,170 @@
-// Ensure db is only declared once here
-if (typeof db === 'undefined') {
-  var db;
-}
+// 1. OPEN DATABASE
+let db;
+const req = indexedDB.open("ReflectorDB", 1);
 
-const dbRequest = indexedDB.open("ResourceReflectorDB", 1);
-
-dbRequest.onerror = (event) => console.error("Memory offline:", event.target.error);
-
-dbRequest.onsuccess = (event) => {
-  db = event.target.result;
-  renderResources();
+req.onsuccess = (e) => {
+  db = e.target.result;
+  showCards();
 };
 
-dbRequest.onupgradeneeded = (event) => {
-  db = event.target.result;
-  if (!db.objectStoreNames.contains("resources")) {
-    db.createObjectStore("resources", { keyPath: "id", autoIncrement: true });
-  }
+req.onupgradeneeded = (e) => {
+  db = e.target.result;
+  db.createObjectStore("links", { keyPath: "id", autoIncrement: true });
 };
 
-const resourceList = document.getElementById('resourceList');
+// 2. DOM ELEMENT SELECTORS
 const form = document.getElementById('resourceForm');
-const searchInput = document.getElementById('search');
-const typeSelect = document.getElementById('type');
-const contentInput = document.getElementById('content');
-const fileInput = document.getElementById('fileInput');
-const titleInput = document.getElementById('title');
+const list = document.getElementById('resourceList');
+const titleBox = document.getElementById('title');
+const contentBox = document.getElementById('content');
+const typeBox = document.getElementById('type');
+const tagsBox = document.getElementById('tags');
+const searchBox = document.getElementById('search');
 
-// Handles field view transformations cleanly depending on format context selection
-typeSelect.addEventListener('change', () => {
-  if (typeSelect.value === 'file') {
-    contentInput.classList.add('hidden');
-    contentInput.required = false;
+// 3. ALTERNATE VISIBILITY FOR FILE INPUT
+typeBox.addEventListener('change', () => {
+  const fileInput = document.getElementById('fileInput');
+  if (typeBox.value === 'file') {
+    contentBox.classList.add('hidden');
     fileInput.classList.remove('hidden');
+    contentBox.required = false;
   } else {
-    contentInput.classList.remove('hidden');
-    contentInput.required = true;
+    contentBox.classList.remove('hidden');
     fileInput.classList.add('hidden');
-    
-    if (typeSelect.value === 'link') {
-      contentInput.placeholder = "Paste your link here (https://...)";
-    } else {
-      contentInput.placeholder = "Type out your note or thought here...";
-    }
+    contentBox.required = true;
+    contentBox.placeholder = typeBox.value === 'link' ? "Paste URL..." : "Type note...";
   }
 });
 
-// ⚡ COZY INTELLIGENT PAYLOAD BRIDGE INTERCEPTOR
-// This captures data blocks emitted by verify_and_scrape.py when pasted into Title field
-titleInput.addEventListener('paste', (e) => {
-  const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+// 4. SMART CLIPBOARD PARSER FOR LINKHARVEST.PY
+titleBox.addEventListener('paste', (e) => {
+  const text = (e.clipboardData || window.clipboardData).getData('text');
   
-  if (pastedText.includes('Title:') && pastedText.includes('URL:') && pastedText.includes('Summary:')) {
-    e.preventDefault(); // Halt standard paste injection text breakages
+  if (text.includes('Title:') && text.includes('URL:') && text.includes('Summary:')) {
+    e.preventDefault();
     
-    const lines = pastedText.split('\n');
-    let scrapedTitle = "";
-    let scrapedUrl = "";
-    let scrapedSummary = "";
+    const lines = text.split('\n');
+    let t = "", u = "", s = "";
 
-    lines.forEach(line => {
-      if (line.startsWith('Title:')) scrapedTitle = line.replace('Title:', '').trim();
-      if (line.startsWith('URL:')) scrapedUrl = line.replace('URL:', '').trim();
-      if (line.startsWith('Summary:')) scrapedSummary = line.replace('Summary:', '').trim();
-    });
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('Title:')) t = lines[i].replace('Title:', '').trim();
+      if (lines[i].startsWith('URL:')) u = lines[i].replace('URL:', '').trim();
+      if (lines[i].startsWith('Summary:')) s = lines[i].replace('Summary:', '').trim();
+    }
 
-    // Auto-populate the active input interfaces and switch type explicitly to link
-    titleInput.value = scrapedTitle;
-    typeSelect.value = 'link';
+    titleBox.value = t;
+    typeBox.value = 'link';
+    contentBox.classList.remove('hidden');
+    document.getElementById('fileInput').classList.add('hidden');
     
-    contentInput.classList.remove('hidden');
-    fileInput.classList.add('hidden');
-    contentInput.placeholder = "Paste your link here (https://...)";
-    contentInput.value = scrapedUrl;
-    
-    // Cache the scraped meta summaries directly onto a temporary dataset attribute
-    contentInput.setAttribute('data-scraped-summary', scrapedSummary);
-    
-    document.getElementById('tags').value = "verified, scraped";
-    console.log("⚡ Handcrafted Bridge Activated: Unpacked verified Python payload cleanly.");
+    contentBox.value = u + "\n\n[Summary: " + s + "]";
+    tagsBox.value = "harvested, link";
   }
 });
 
-function renderResources(filter = '') {
+// 5. SHOW CARDS ON SCREEN
+function showCards(searchQuery = '') {
   if (!db) return;
+  list.innerHTML = '';
 
-  resourceList.innerHTML = '';
-  
-  const transaction = db.transaction(["resources"], "readonly");
-  const store = transaction.objectStore("resources");
-  const request = store.getAll();
-
-  request.onsuccess = () => {
-    const allResources = request.result;
+  db.transaction(["links"], "readonly").objectStore("links").getAll().onsuccess = (e) => {
+    const items = e.target.result;
     
-    const filtered = allResources.filter(r =>
-      r.title.toLowerCase().includes(filter.toLowerCase()) ||
-      (r.tags && r.tags.some(tag => tag.toLowerCase().includes(filter.toLowerCase())))
-    );
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      
+      if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) continue;
 
-    if (filtered.length === 0) {
-      resourceList.innerHTML = '<p class="subtitle" style="text-align: center; padding: 1rem 0;">No reflections matched your criteria.</p>';
-      return;
-    }
-
-    filtered.forEach((res) => {
       const card = document.createElement('div');
       card.className = 'resource-card';
 
-      let displayContent = '';
-      if (res.type === 'link') {
-        const summaryMarkup = res.summary ? `<div class="resource-summary-text" style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem; font-style:italic;">"${res.summary}"</div>` : '';
-        displayContent = `
-          <div class="resource-content">
-            <a href="${res.content}" target="_blank">${res.content}</a>
-            ${summaryMarkup}
-          </div>`;
-      } else if (res.type === 'note') {
-        displayContent = `<div class="resource-content">${res.content}</div>`;
-      } else if (res.type === 'file') {
-        if (res.fileType && res.fileType.startsWith('image/')) {
-          displayContent = `<img src="${res.content}" alt="${res.fileName}">`;
-        } else {
-          displayContent = `<div class="resource-content"><a href="${res.content}" download="${res.fileName}">💾 ${res.fileName}</a></div>`;
-        }
-      }
-
-      const formatIcons = { link: '🔗', note: '✍️', file: '📁' };
-      const icon = formatIcons[res.type] || '📄';
-
-      const tagElements = res.tags ? res.tags.map(t => `<span class="tag-badge">#${t}</span>`).join(' ') : '';
-
       card.innerHTML = `
-        <div class="resource-card-header">
-          <h3>${res.title} <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted); margin-left: 0.25rem;">${icon}</span></h3>
-        </div>
-        ${displayContent}
+        <div style="font-weight:bold;">${item.title} [${item.type.toUpperCase()}]</div>
+        <div class="resource-content">${item.content}</div>
         <div class="resource-footer-row">
-          <div class="resource-tags">${tagElements}</div>
-          <button class="delete-btn" data-id="${res.id}">Remove</button>
+          <div>Tags: ${item.tags}</div>
+          <button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button>
         </div>
       `;
-
-      card.querySelector('.delete-btn').addEventListener('click', (e) => {
-        const idToDelete = parseInt(e.target.getAttribute('data-id'));
-        removeResource(idToDelete);
-      });
-
-      resourceList.appendChild(card);
-    });
+      list.appendChild(card);
+    }
   };
 }
 
-function removeResource(id) {
-  const transaction = db.transaction(["resources"], "readwrite");
-  const store = transaction.objectStore("resources");
-  store.delete(id).onsuccess = () => {
-    renderResources(searchInput.value);
+// 6. DELETE ITEM
+function deleteItem(id) {
+  db.transaction(["links"], "readwrite").objectStore("links").delete(id).onsuccess = () => {
+    showCards(searchBox.value);
   };
 }
 
-function commitToMemory(resourceObject) {
-  const transaction = db.transaction(["resources"], "readwrite");
-  const store = transaction.objectStore("resources");
-  
-  store.add(resourceObject).onsuccess = () => {
-    renderResources(searchInput.value);
-    form.reset();
-    contentInput.removeAttribute('data-scraped-summary');
-    contentInput.classList.remove('hidden');
-    contentInput.placeholder = "Paste your link or type out your note here...";
-    contentInput.required = false;
-    fileInput.classList.add('hidden');
-  };
-}
-
+// 7. SUBMIT AND SAVE
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   
-  const title = titleInput.value.trim();
-  const type = typeSelect.value;
-  const rawTags = document.getElementById('tags').value;
-  const tags = rawTags.split(',').map(t => t.replace(/,/g, '').trim().toLowerCase()).filter(t => t);
-
-  if (!type) {
-    typeSelect.style.borderColor = 'var(--danger)';
-    return;
+  let contentValue = contentBox.value;
+  
+  if (typeBox.value === 'file') {
+    const fileFiles = document.getElementById('fileInput').files;
+    contentValue = (fileFiles && fileFiles.length > 0) ? "Attached File: " + fileFiles[0].name : "No file attached";
   }
-  typeSelect.style.borderColor = '';
 
-  if (type === 'file') {
-    const file = fileInput.files[0];
-    if (!file) {
-      fileInput.style.outline = '1px solid var(--danger)';
-      return;
-    }
-    fileInput.style.outline = '';
+  const newRecord = {
+    title: titleBox.value.trim(),
+    type: typeBox.value,
+    content: contentValue,
+    tags: tagsBox.value.trim()
+  };
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      commitToMemory({
-        title, type, content: event.target.result,
-        tags, fileName: file.name, fileType: file.type
-      });
-    };
-    reader.readAsDataURL(file);
-  } else {
-    const content = contentInput.value.trim();
-    const summary = contentInput.getAttribute('data-scraped-summary') || '';
-    commitToMemory({ title, type, content, tags, summary });
-  }
-});
-
-searchInput.addEventListener('input', () => {
-  renderResources(searchInput.value);
-});
-
-// --- DATA VAULT BACKUP ENGINE LOGIC ---
-document.getElementById('exportBtn').addEventListener('click', () => {
-  if (!db) return;
-  const transaction = db.transaction(["resources"], "readonly");
-  const store = transaction.objectStore("resources");
-  const request = store.getAll();
-
-  request.onsuccess = () => {
-    const dataStr = JSON.stringify(request.result, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.href = url;
-    downloadAnchor.download = "resourcereflector_live_vault.json";
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-    URL.revokeObjectURL(url);
+  db.transaction(["links"], "readwrite").objectStore("links").add(newRecord).onsuccess = () => {
+    form.reset();
+    contentBox.classList.remove('hidden');
+    document.getElementById('fileInput').classList.add('hidden');
+    showCards(searchBox.value);
   };
 });
 
+// 8. LIVE SEARCH
+searchBox.addEventListener('input', (e) => {
+  showCards(e.target.value);
+});
+
+// 9. EXTRA: RAW BACKUP EXPORT
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!db) return;
+  db.transaction(["links"], "readonly").objectStore("links").getAll().onsuccess = (e) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(e.target.result, null, 2)], {type: "application/json"}));
+    a.download = "reflector_backup.json";
+    a.click();
+  };
+});
+
+// 10. EXTRA: RAW BACKUP IMPORT
 document.getElementById('importFile').addEventListener('change', (e) => {
   const files = e.target.files;
   if (!files || files.length === 0) return;
-  const file = files[0];
 
   const reader = new FileReader();
-  reader.onload = function(event) {
+  reader.onload = (event) => {
     try {
-      const importedData = JSON.parse(event.target.result);
-      if (!Array.isArray(importedData)) throw new Error("Invalid structure format");
-
-      const transaction = db.transaction(["resources"], "readwrite");
-      const store = transaction.objectStore("resources");
-
-      importedData.forEach(item => {
-        if (item.id) delete item.id;
+      const records = JSON.parse(event.target.result);
+      const tx = db.transaction(["links"], "readwrite");
+      const store = tx.objectStore("links");
+      
+      for (let i = 0; i < records.length; i++) {
+        let item = records[i];
+        if (item.id) delete item.id; // Allow IndexedDB to auto-increment smoothly
         store.add(item);
-      });
-
-      transaction.oncomplete = () => {
-        renderResources(searchInput.value);
-        e.target.value = '';
+      }
+      
+      tx.oncomplete = () => {
+        showCards(searchBox.value);
+        e.target.value = ''; // Clear file input field
       };
     } catch (err) {
-      console.error("Failed importing database state:", err);
-      document.getElementById('importFile').style.outline = '1px solid var(--danger)';
+      console.error("JSON parsing fault hit.");
     }
   };
-  reader.readAsText(file);
+  reader.readAsText(files[0]);
 });
-
-console.log("Handcrafted out of personal necessity by Nubaid. Clarity first.");
