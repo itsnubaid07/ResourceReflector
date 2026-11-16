@@ -4,7 +4,7 @@ I built this application because my browser tabs were constantly cluttered, my p
 
 Resource Reflector runs completely local-first. It requires no login accounts, handles no remote servers, logs zero analytics telemetry, and stores your data safely inside your browser's own protected memory database (IndexedDB).
 
-👉 **Live Workspace:** https://github.io
+👉 **Live Workspace:** https://itsnubaid07.github.io/ResourceReflector/
 
 ## ⚡ The System Utility: `linkharvest.py`
 To bypass browser security isolation restrictions (CORS blocks) and check link validity before saving, I wrote a dedicated command-line console tool: `linkharvest.py`.
