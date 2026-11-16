@@ -72,14 +72,16 @@ function showCards(searchQuery = '') {
     
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
+      const safeTitle = item.title || "Untitled";
+      const safeType = (item.type || "NOTE").toUpperCase();
       
-      if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) continue;
+      if (searchQuery && !safeTitle.toLowerCase().includes(searchQuery.toLowerCase())) continue;
 
       const card = document.createElement('div');
       card.className = 'resource-card';
 
-            card.innerHTML = `
-        <div style="font-weight:bold;">${item.title || "Untitled"} [${(item.type || "NOTE").toUpperCase()}]</div>
+      card.innerHTML = `
+        <div style="font-weight:bold;">${safeTitle} [${safeType}]</div>
         <div class="resource-content">${item.content || ""}</div>
         <div class="resource-footer-row">
           <div>Tags: ${item.tags || "none"}</div>
@@ -107,12 +109,12 @@ form.addEventListener('submit', (e) => {
   
   if (typeBox.value === 'file') {
     const fileFiles = document.getElementById('fileInput').files;
-    contentValue = (fileFiles && fileFiles.length > 0) ? "Attached File: " + fileFiles[0].name : "No file attached";
+    contentValue = (fileFiles && fileFiles.length > 0) ? "Attached File: " + fileFiles.name : "No file attached";
   }
 
   const newRecord = {
     title: titleBox.value.trim(),
-    type: typeBox.value,
+    type: typeBox.value || "note",
     content: contentValue,
     tags: tagsBox.value.trim()
   };
@@ -155,17 +157,17 @@ document.getElementById('importFile').addEventListener('change', (e) => {
       
       for (let i = 0; i < records.length; i++) {
         let item = records[i];
-        if (item.id) delete item.id; // Allow IndexedDB to auto-increment smoothly
+        if (item.id) delete item.id;
         store.add(item);
       }
       
       tx.oncomplete = () => {
         showCards(searchBox.value);
-        e.target.value = ''; // Clear file input field
+        e.target.value = '';
       };
     } catch (err) {
       console.error("JSON parsing fault hit.");
     }
   };
-  reader.readAsText(files[0]);
+  reader.readAsText(files);
 });
