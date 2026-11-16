@@ -78,14 +78,15 @@ function showCards(searchQuery = '') {
       const card = document.createElement('div');
       card.className = 'resource-card';
 
-      card.innerHTML = `
-        <div style="font-weight:bold;">${item.title} [${item.type.toUpperCase()}]</div>
-        <div class="resource-content">${item.content}</div>
+            card.innerHTML = `
+        <div style="font-weight:bold;">${item.title || "Untitled"} [${(item.type || "NOTE").toUpperCase()}]</div>
+        <div class="resource-content">${item.content || ""}</div>
         <div class="resource-footer-row">
-          <div>Tags: ${item.tags}</div>
+          <div>Tags: ${item.tags || "none"}</div>
           <button class="delete-btn" onclick="deleteItem(${item.id})">Delete</button>
         </div>
       `;
+
       list.appendChild(card);
     }
   };
