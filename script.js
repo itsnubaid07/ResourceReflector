@@ -107,9 +107,9 @@ form.addEventListener('submit', (e) => {
   
   let contentValue = contentBox.value;
   
-  if (typeBox.value === 'file') {
+   if (typeBox.value === 'file') {
     const fileFiles = document.getElementById('fileInput').files;
-    contentValue = (fileFiles && fileFiles.length > 0) ? "Attached File: " + fileFiles.name : "No file attached";
+    contentValue = (fileFiles && fileFiles.length > 0) ? "Attached File: " + fileFiles[0].name : "No file attached";
   }
 
   const newRecord = {
@@ -169,5 +169,6 @@ document.getElementById('importFile').addEventListener('change', (e) => {
       console.error("JSON parsing fault hit.");
     }
   };
-  reader.readAsText(files);
+  reader.readAsText(files[0]);
+
 });
